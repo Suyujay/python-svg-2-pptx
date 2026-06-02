@@ -1,0 +1,70 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="m0 0 10 5-10 5z" fill="#007bff"/>
+    </marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="m0 0 10 5-10 5z" fill="#ff5733"/>
+    </marker>
+  </defs>
+  <text x="480" y="80" font-family="Segoe UI" font-size="32" font-weight="bold" fill="#222" text-anchor="middle" data-element-type="header">
+      <tspan x="480" dy="0">System Architecture Flow</tspan>
+      <tspan x="480" dy="30" font-size="18" font-weight="normal" fill="#666">Automated data extraction and processing pipeline</tspan>
+    </text>
+  <g data-element-type="infoBox">
+    <rect x="80" y="160" width="200" height="180" rx="12" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
+    <svg x="164" y="180" width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-element-type="icon" data-icon-name="database">
+      <g class="pptx-icon" data-icon-name="database_server">
+        <path fill="none" d="M0 0h24v24H0z"/>
+        <path d="M20 6c0-1.66-3.58-3-8-3S4 4.34 4 6v3c0 1.66 3.58 3 8 3s8-1.34 8-3z" fill="#007bff"/>
+        <path d="M12 9c3.87 0 7-1.16 7-2.5S15.87 4 12 4 5 5.16 5 6.5 8.13 9 12 9" fill="#fff" fill-opacity=".25"/>
+        <path d="M4 11v3c0 1.66 3.58 3 8 3s8-1.34 8-3v-3c0 1.66-3.58 3-8 3s-8-1.34-8-3" fill="#007bff"/>
+        <path d="M4 16v3c0 1.66 3.58 3 8 3s8-1.34 8-3v-3c0 1.66-3.58 3-8 3s-8-1.34-8-3" fill="#007bff"/>
+      </g>
+    </svg>
+    <text x="180" y="240" font-family="Arial" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      <tspan x="180" dy="0">Data Source</tspan>
+      <tspan x="180" dy="26" font-size="14" font-weight="normal" fill="#666">Raw ingestion from</tspan>
+      <tspan x="180" dy="20" font-size="14" font-weight="normal" fill="#666">multiple API endpoints</tspan>
+      <tspan x="180" dy="20" font-size="14" font-weight="normal" fill="#666">into the system.</tspan>
+    </text>
+  </g>
+  <g data-element-type="infoBox">
+    <rect x="380" y="160" width="200" height="180" rx="12" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
+    <svg x="464" y="180" width="32" height="32" viewBox="0 0 24 24" data-element-type="icon" data-icon-name="gears">
+      <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.37-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.73 8.87c-.11.21-.07.47.13.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6" fill="#007bff"/>
+    </svg>
+    <text x="480" y="240" font-family="Arial" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      <tspan x="480" dy="0">Processing</tspan>
+      <tspan x="480" dy="26" font-size="14" font-weight="normal" fill="#666">Data transformation</tspan>
+      <tspan x="480" dy="20" font-size="14" font-weight="normal" fill="#666">and normalization</tspan>
+      <tspan x="480" dy="20" font-size="14" font-weight="normal" fill="#666">via central engine.</tspan>
+    </text>
+  </g>
+  <g data-element-type="infoBox">
+    <rect x="680" y="160" width="200" height="180" rx="12" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
+    <svg x="764" y="180" width="32" height="32" viewBox="0 0 24 24" data-element-type="icon" data-icon-name="chart">
+      <path d="M3 3v17a1 1 0 0 0 1 1h17v-2H5V3zm15.2 5.5-5 5-3.6-3.6a.996.996 0 0 0-1.41 0l-5.3 5.3 1.4 1.4 4.6-4.6 3.6 3.6c.39.39 1.02.39 1.41 0l5.7-5.7z" fill="#007bff"/>
+    </svg>
+    <text x="780" y="240" font-family="Arial" font-size="18" font-weight="bold" fill="#333" text-anchor="middle">
+      <tspan x="780" dy="0">Analytics</tspan>
+      <tspan x="780" dy="26" font-size="14" font-weight="normal" fill="#666">Visualizing insights</tspan>
+      <tspan x="780" dy="20" font-size="14" font-weight="normal" fill="#666">for stakeholders</tspan>
+      <tspan x="780" dy="20" font-size="14" font-weight="normal" fill="#666">on live dashboard.</tspan>
+    </text>
+  </g>
+  <g data-element-type="infoBox">
+    <rect x="80" y="420" width="350" height="60" rx="6" fill="#fff" stroke="#ccc"/>
+    <line stroke="#007bff" stroke-width="3" x1="100" y1="450" x2="140" y2="450"/>
+    <text x="150" y="455" font-family="Calibri" font-size="14" font-weight="bold" fill="#333">
+      <tspan x="150" dy="0">Standard Flow</tspan>
+    </text>
+    <line stroke="#ff5733" stroke-width="2" stroke-dasharray="4,4" x1="280" y1="450" x2="320" y2="450"/>
+    <text x="280" y="455" font-family="Calibri" font-size="14" font-weight="bold" fill="#333">
+      <tspan x="330" dy="0">Feedback</tspan>
+    </text>
+  </g>
+  <line data-element-type="connector" data-connector-type="straight" stroke="#007bff" stroke-width="3" fill="none" marker-end="url(#a)" data-start="card-source" data-end="card-process" x1="280" y1="250" x2="372" y2="250"/>
+  <line data-element-type="connector" data-connector-type="straight" stroke="#007bff" stroke-width="3" fill="none" marker-end="url(#a)" data-start="card-process" data-end="card-output" x1="580" y1="250" x2="672" y2="250"/>
+  <polyline data-element-type="connector" data-connector-type="elbow" stroke="#ff5733" stroke-width="2" stroke-dasharray="6,4" fill="none" marker-end="url(#b)" data-start="card-output" data-end="card-process" points="780,340 780,400 480,400 480,348"/>
+</svg>

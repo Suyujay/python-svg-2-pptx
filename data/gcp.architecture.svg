@@ -1,0 +1,252 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#475569" />
+    </marker>
+  </defs>
+
+  <!-- Title & Header -->
+  <text x="30" y="35" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">Google Cloud ETL Architecture: IronSource to BigQuery</text>
+  <text x="30" y="55" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#475569">Automated Medallion Pipeline (Bronze → Silver → Gold) for Cost-Effective Data Warehousing</text>
+
+  <!-- Background Column Lanes -->
+  <!-- Lane 1: Ingestion -->
+  <rect x="30" y="80" width="210" height="380" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="135" y="102" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#64748B" text-anchor="middle" letter-spacing="0.5">1. INGESTION</text>
+
+  <!-- Lane 2: Processing & Medallion -->
+  <rect x="250" y="80" width="210" height="380" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="355" y="102" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#64748B" text-anchor="middle" letter-spacing="0.5">2. BRONZE &amp; SILVER</text>
+
+  <!-- Lane 3: Consolidation -->
+  <rect x="480" y="80" width="210" height="380" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="585" y="102" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#64748B" text-anchor="middle" letter-spacing="0.5">3. GOLD CONSOLIDATION</text>
+
+  <!-- Lane 4: Storage & Analytics -->
+  <rect x="710" y="80" width="220" height="380" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="820" y="102" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#64748B" text-anchor="middle" letter-spacing="0.5">4. ANALYTICS LOAD</text>
+
+
+  <!-- ==================== COLUMN 1 ELEMENTS ==================== -->
+  <!-- IronSource API Box (External Source) -->
+  <g id="ironSourceApi" data-element-type="infoBox">
+    <rect x="45" y="115" width="85" height="65" rx="6" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="api">
+      <svg x="75" y="122" width="24" height="24" viewBox="0 0 24 24">
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z" fill="#8B5CF6"/>
+      </svg>
+    </g>
+    <text x="87.5" y="162" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold" fill="#5B21B6" text-anchor="middle">IronSource API</text>
+  </g>
+
+  <!-- Cloud Scheduler Box -->
+  <g id="cloudScheduler" data-element-type="infoBox">
+    <rect x="140" y="115" width="85" height="65" rx="6" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="scheduler">
+      <svg x="170" y="122" width="24" height="24" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="#1D4ED8" stroke-width="2" fill="none"/>
+        <polyline points="12,6 12,12 16,14" stroke="#1D4ED8" stroke-width="2" fill="none"/>
+      </svg>
+    </g>
+    <text x="182.5" y="162" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">Cloud Scheduler</text>
+  </g>
+
+  <!-- Cloud Run (Ingester) -->
+  <g id="cloudRunIngester" data-element-type="infoBox">
+    <rect x="45" y="210" width="180" height="85" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="cloudrun">
+      <svg x="55" y="220" width="24" height="24" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="2" stroke="#DC2626" stroke-width="2" fill="none"/>
+        <path d="M7 12h10M12 7l5 5-5 5" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </g>
+    <text x="87" y="235" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#991B1B">Cloud Run (Ingester)</text>
+    <text x="55" y="255" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#475569">
+      <tspan x="55" dy="2">- Authenticates with API</tspan>
+      <tspan x="55" dy="12">- Extracts Native JSON/CSV</tspan>
+    </text>
+  </g>
+
+
+  <!-- ==================== COLUMN 2 ELEMENTS ==================== -->
+  <!-- GCS Bronze Bucket -->
+  <g id="gcsBronze" data-element-type="infoBox">
+    <rect x="265" y="115" width="180" height="85" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="gcs">
+      <svg x="275" y="125" width="24" height="24" viewBox="0 0 24 24">
+        <ellipse cx="12" cy="6" rx="8" ry="3" fill="none" stroke="#D97706" stroke-width="2"/>
+        <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6" fill="none" stroke="#D97706" stroke-width="2"/>
+        <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" fill="none" stroke="#D97706" stroke-width="2"/>
+      </svg>
+    </g>
+    <text x="307" y="140" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#92400E">Bronze Bucket (GCS)</text>
+    <text x="275" y="160" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#475569">
+      <tspan x="275" dy="2">- Raw, Immutable Logs</tspan>
+      <tspan x="275" dy="12">- Source of Truth Archive</tspan>
+    </text>
+  </g>
+
+  <!-- Cloud Run (Transformer) -->
+  <g id="cloudRunTransformer" data-element-type="infoBox">
+    <rect x="265" y="225" width="180" height="85" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="cloudrun">
+      <svg x="275" y="235" width="24" height="24" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="2" stroke="#DC2626" stroke-width="2" fill="none"/>
+        <path d="M7 12h10M12 7l5 5-5 5" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </g>
+    <text x="307" y="250" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#991B1B">Cloud Run (Transformer)</text>
+    <text x="275" y="270" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#475569">
+      <tspan x="275" dy="2">- Schema Validation</tspan>
+      <tspan x="275" dy="12">- Data Cleaning &amp; Formatting</tspan>
+    </text>
+  </g>
+
+  <!-- GCS Silver Bucket -->
+  <g id="gcsSilver" data-element-type="infoBox">
+    <rect x="265" y="335" width="180" height="85" rx="6" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="gcs">
+      <svg x="275" y="345" width="24" height="24" viewBox="0 0 24 24">
+        <ellipse cx="12" cy="6" rx="8" ry="3" fill="none" stroke="#16A34A" stroke-width="2"/>
+        <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6" fill="none" stroke="#16A34A" stroke-width="2"/>
+        <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" fill="none" stroke="#16A34A" stroke-width="2"/>
+      </svg>
+    </g>
+    <text x="307" y="360" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#14532D">Silver Bucket (GCS)</text>
+    <text x="275" y="380" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#475569">
+      <tspan x="275" dy="2">- Cleaned and Standardized</tspan>
+      <tspan x="275" dy="12">- Valid Staging Area</tspan>
+    </text>
+  </g>
+
+
+  <!-- ==================== COLUMN 3 ELEMENTS ==================== -->
+  <!-- GCS Compose Process -->
+  <g id="gcsCompose" data-element-type="infoBox">
+    <rect x="495" y="165" width="180" height="85" rx="6" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="compose">
+      <svg x="505" y="175" width="24" height="24" viewBox="0 0 24 24">
+        <path d="M9 21h9c1.1 0 2-.9 2-2v-9H9v11zm-5-4h3V5H4v12zm1-14h14v2H5V3z" fill="#D97706"/>
+      </svg>
+    </g>
+    <text x="537" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#78350F">GCS Compose</text>
+    <text x="505" y="210" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#475569">
+      <tspan x="505" dy="2">- Combines multiple blobs</tspan>
+      <tspan x="505" dy="12">- Minimizes downstream APIs</tspan>
+    </text>
+  </g>
+
+  <!-- GCS Gold Bucket -->
+  <g id="gcsGold" data-element-type="infoBox">
+    <rect x="495" y="295" width="180" height="85" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="gcs">
+      <svg x="505" y="305" width="24" height="24" viewBox="0 0 24 24">
+        <ellipse cx="12" cy="6" rx="8" ry="3" fill="none" stroke="#D97706" stroke-width="2"/>
+        <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6" fill="none" stroke="#D97706" stroke-width="2"/>
+        <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" fill="none" stroke="#D97706" stroke-width="2"/>
+      </svg>
+    </g>
+    <text x="537" y="320" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#78350F">Gold Bucket (GCS)</text>
+    <text x="505" y="340" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#475569">
+      <tspan x="505" dy="2">- Consolidated Large Files</tspan>
+      <tspan x="505" dy="12">- Optimised Parquet/NDJSON</tspan>
+    </text>
+  </g>
+
+
+  <!-- ==================== COLUMN 4 ELEMENTS ==================== -->
+  <!-- BigQuery Load Job -->
+  <g id="bqLoadJob" data-element-type="infoBox">
+    <rect x="730" y="130" width="180" height="80" rx="6" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+    <g data-element-type="icon" data-icon-name="bqload">
+      <svg x="740" y="138" width="24" height="24" viewBox="0 0 24 24">
+        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z" fill="#1D4ED8"/>
+      </svg>
+    </g>
+    <text x="772" y="153" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#1E40AF">BigQuery Load Job</text>
+    <text x="740" y="173" font-family="Segoe UI, Arial, sans-serif" font-size="9" fill="#475569">
+      <tspan x="740" dy="2">- Batch Load Mechanism</tspan>
+      <tspan x="740" dy="12">- Cost-effective / Non-streaming</tspan>
+    </text>
+  </g>
+
+  <!-- BigQuery Target Dataset -->
+  <g id="bqDataset" data-element-type="infoBox">
+    <rect x="730" y="235" width="180" height="205" rx="6" fill="#FFFFFF" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="740" y="255" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#1E40AF">BigQuery Dataset</text>
+
+    <!-- Fact Tables inside BigQuery -->
+    <g id="bqFactTable">
+      <rect x="740" y="270" width="160" height="70" rx="4" fill="#EFF6FF" stroke="#2563EB" stroke-width="1"/>
+      <text x="750" y="285" font-family="Segoe UI, Arial, sans-serif" font-size="9" font-weight="bold" fill="#1D4ED8">Fact Tables</text>
+      <text x="750" y="299" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="#475569">
+        <tspan x="750" dy="0">- Dynamic Partition Overwrite</tspan>
+        <tspan x="750" dy="10">- Overwrites targeting day/date</tspan>
+        <tspan x="750" dy="10">- Idempotency guaranteed</tspan>
+      </text>
+    </g>
+
+    <!-- Dimension Tables inside BigQuery -->
+    <g id="bqDimTable">
+      <rect x="740" y="355" width="160" height="70" rx="4" fill="#EFF6FF" stroke="#2563EB" stroke-width="1"/>
+      <text x="750" y="370" font-family="Segoe UI, Arial, sans-serif" font-size="9" font-weight="bold" fill="#1D4ED8">Dimension Tables</text>
+      <text x="750" y="384" font-family="Segoe UI, Arial, sans-serif" font-size="8" fill="#475569">
+        <tspan x="750" dy="0">- Full Overwrite Strategy</tspan>
+        <tspan x="750" dy="10">- Small Metadata Snapshots</tspan>
+        <tspan x="750" dy="10">- Complete daily refresh</tspan>
+      </text>
+    </g>
+  </g>
+
+
+  <!-- ==================== CONNECTORS ==================== -->
+  <!-- Col 1: Scheduler to Ingester (Straight Down) -->
+  <line id="conn-sched" data-element-type="connector" data-connector-type="straight" x1="182.5" y1="180" x2="182.5" y2="210" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)" data-start="cloudScheduler" data-end="cloudRunIngester" />
+
+  <!-- Col 1: API to Ingester (Straight Down) -->
+  <line id="conn-api" data-element-type="connector" data-connector-type="straight" x1="87.5" y1="180" x2="87.5" y2="210" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)" data-start="ironSourceApi" data-end="cloudRunIngester" />
+
+  <!-- Col 1 to Col 2: Ingester to Bronze (Elbow) -->
+  <polyline id="conn-ingest-bronze" data-element-type="connector" data-connector-type="elbow" points="225,252.5 245,252.5 245,157.5 265,157.5" stroke="#475569" stroke-width="1.5" fill="none" marker-end="url(#arrow)" data-start="cloudRunIngester" data-end="gcsBronze" />
+
+  <!-- Col 2: Bronze to Transformer (Straight Down) -->
+  <line id="conn-bronze-trans" data-element-type="connector" data-connector-type="straight" x1="355" y1="200" x2="355" y2="225" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)" data-start="gcsBronze" data-end="cloudRunTransformer" />
+
+  <!-- Col 2: Transformer to Silver (Straight Down) -->
+  <line id="conn-trans-silver" data-element-type="connector" data-connector-type="straight" x1="355" y1="310" x2="355" y2="335" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)" data-start="cloudRunTransformer" data-end="gcsSilver" />
+
+  <!-- Col 2 to Col 3: Silver to Compose (Elbow) -->
+  <polyline id="conn-silver-compose" data-element-type="connector" data-connector-type="elbow" points="445,377.5 470,377.5 470,207.5 495,207.5" stroke="#475569" stroke-width="1.5" fill="none" marker-end="url(#arrow)" data-start="gcsSilver" data-end="gcsCompose" />
+
+  <!-- Col 3: Compose to Gold (Straight Down) -->
+  <line id="conn-compose-gold" data-element-type="connector" data-connector-type="straight" x1="585" y1="250" x2="585" y2="295" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)" data-start="gcsCompose" data-end="gcsGold" />
+
+  <!-- Col 3 to Col 4: Gold to BQ Load (Elbow) -->
+  <polyline id="conn-gold-bq" data-element-type="connector" data-connector-type="elbow" points="675,337.5 702.5,337.5 702.5,170 730,170" stroke="#475569" stroke-width="1.5" fill="none" marker-end="url(#arrow)" data-start="gcsGold" data-end="bqLoadJob" />
+
+  <!-- Col 4: BQ Load to BQ Dataset (Straight Down) -->
+  <line id="conn-bq-load" data-element-type="connector" data-connector-type="straight" x1="820" y1="210" x2="820" y2="235" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)" data-start="bqLoadJob" data-end="bqDataset" />
+
+
+  <!-- ==================== KEY BENEFITS FOOTER BANNER ==================== -->
+  <rect x="30" y="475" width="900" height="40" rx="6" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="45" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold" fill="#475569">Key Advantages:</text>
+
+  <!-- Benefit 1 -->
+  <g transform="translate(160, 483)">
+    <rect x="0" y="0" width="220" height="24" rx="12" fill="#E2E8F0"/>
+    <text x="110" y="16" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">✔ Idempotency (Overwrites by Day)</text>
+  </g>
+
+  <!-- Benefit 2 -->
+  <g transform="translate(395, 483)">
+    <rect x="0" y="0" width="220" height="24" rx="12" fill="#E2E8F0"/>
+    <text x="110" y="16" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">✔ Cost-Efficiency (Compose Blobs)</text>
+  </g>
+
+  <!-- Benefit 3 -->
+  <g transform="translate(630, 483)">
+    <rect x="0" y="0" width="230" height="24" rx="12" fill="#E2E8F0"/>
+    <text x="115" y="16" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold" fill="#334155" text-anchor="middle">✔ Lineage Traceable (Separated Buckets)</text>
+  </g>
+</svg>
