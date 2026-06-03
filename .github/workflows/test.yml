@@ -41,9 +41,6 @@ jobs:
     - name: Test with pytest
       id: test
       run: |
-        echo ${{ secrets.GCP_CREDENTIALS }} | base64 --decode > /tmp/gcp-credentials.json
-        export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-credentials.json
-        cd test                                                       # go to test directory
         pytest > test.coverage.log                                    # run tests and save output into file
         SCORE=$(awk '$1 == "TOTAL" {print $NF+0}' test.coverage.log)  # extract coverage score from file
         echo "COVERAGE=$SCORE" >> $GITHUB_OUTPUT                      # save coverage score into output variable
