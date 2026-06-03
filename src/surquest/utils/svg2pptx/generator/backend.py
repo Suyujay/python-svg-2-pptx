@@ -1,4 +1,5 @@
 import io
+import logging
 from typing import Dict
 from lxml import etree as lxml_etree
 
@@ -8,81 +9,51 @@ from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.oxml.ns import qn
 from pptx.util import Emu, Pt
-import pptx.parts.image as _pptx_image
 
-from .models import (
+from ..models import (
     IRSlide, IRNode, IRInfoBox, IRText, IRRectangle, IRIcon, IRLine, IRGroup,
     IREllipse, IRPolygon,
     IRConnector, Point, Color, ArrowType, ConnectorType, TextBlock
 )
+from .image_patch import _pptx_image
 
-class _SvgImageHolder:
-    def __init__(self, blob, w, h, filename=''):
-        self.blob = blob
-        self.ext = 'svg'
-        self.content_type = 'image/svg+xml'
-        self.size = (w, h)
-        self.dpi = (72, 72)
-        self.filename = filename
-
-    @property
-    def sha1(self):
-        import hashlib
-        return hashlib.sha1(self.blob).hexdigest()
-
-def _is_svg(blob):
-    s = blob[:1024].lower()
-    return b'<svg' in s or (b'svg' in s and b'http://www.w3.org' in s)
-
-_orig_from_blob = getattr(_pptx_image.Image, 'from_blob')
-@classmethod
-def _from_blob_patch(cls, blob, filename=None):
-    if _is_svg(blob):
-        return _SvgImageHolder(blob, 100, 100, filename or 'image.svg')
-    return _orig_from_blob(blob, filename)
-_pptx_image.Image.from_blob = _from_blob_patch
-
-_orig_from_file = getattr(_pptx_image.Image, 'from_file')
-@classmethod
-def _from_file_patch(cls, img):
-    if hasattr(img, 'endswith') and img.endswith('.svg'):
-        with open(img, 'rb') as f:
-            b = f.read()
-        return _SvgImageHolder(b, 100, 100, img)
-    elif hasattr(img, 'read'): # In case a file object is passed directly
-        if hasattr(img, 'seek'):
-            img.seek(0)
-        blob = img.read()
-        if hasattr(img, 'seek'):
-            img.seek(0)
-        if _is_svg(blob):
-            return _SvgImageHolder(blob, 100, 100, 'image.svg')
-    return _orig_from_file(img)
-_pptx_image.Image.from_file = _from_file_patch
+logger = logging.getLogger(__name__)
 
 class PPTXBackend:
     """Backend: IR -> python-pptx Presentation."""
 
-    def __init__(self, ir_slide: IRSlide):
-        self.ir = ir_slide
+    def __init__(self, ir_slides):
+        if not isinstance(ir_slides, list):
+            ir_slides = [ir_slides]
+        self.ir_slides = ir_slides
         self.prs = Presentation()
-        self.prs.slide_width = ir_slide.width_emu
-        self.prs.slide_height = ir_slide.height_emu
-        blank_layout = self.prs.slide_layouts[6]
-        self.slide = self.prs.slides.add_slide(blank_layout)
-        # Layout registry maps shape_ids/refs to pptx shape objects
-        self._registry: Dict[str, object] = {}
-        self._connectable_shapes = []
+        if self.ir_slides:
+            self.prs.slide_width = self.ir_slides[0].width_emu
+            self.prs.slide_height = self.ir_slides[0].height_emu
 
     def render(self) -> Presentation:
-        # Pass 1: Render shapes, infoBoxes, icons, text. Build registry.
-        for node in self.ir.nodes:
-            self._dispatch_shape(node)
+        blank_layout = self.prs.slide_layouts[6]
+        for ir_slide in self.ir_slides:
+            self.current_ir_slide = ir_slide
+            self.slide = self.prs.slides.add_slide(blank_layout)
+            # Layout registry maps shape_ids/refs to pptx shape objects
+            self._registry: Dict[str, object] = {}
+            self._connectable_shapes = []
 
-        # Pass 2: Render connectors (now that all shapes exist)
-        for node in self.ir.nodes:
-            if isinstance(node, IRConnector):
-                self._render_connector(node)
+            # Pass 1a: Render shapes, infoBoxes, icons (non-text). Build registry.
+            for node in ir_slide.nodes:
+                if not isinstance(node, (IRConnector, IRText)):
+                    self._dispatch_shape(node)
+
+            # Pass 1b: Render texts (z-order top)
+            for node in ir_slide.nodes:
+                if isinstance(node, IRText):
+                    self._dispatch_shape(node)
+
+            # Pass 2: Render connectors (now that all shapes exist)
+            for node in ir_slide.nodes:
+                if isinstance(node, IRConnector):
+                    self._render_connector(node)
         return self.prs
 
     # ---------- Pass 1 dispatch ----------
@@ -108,12 +79,74 @@ class PPTXBackend:
 
     # ---------- Renderers ----------
 
+    def _embed_text_in_shape(self, shape, ir_text: IRText):
+        tf = shape.text_frame
+        tf.clear()
+        tf.word_wrap = True
+        
+        rect_x = Emu(int(shape.left))
+        rect_y = Emu(int(shape.top))
+        rect_w = Emu(int(shape.width))
+        text_x = ir_text.block.anchor_x
+        text_y = ir_text.block.anchor_y
+        
+        if ir_text.block.alignment == PP_ALIGN.LEFT:
+            tf.margin_left = max(Emu(0), text_x - rect_x)
+            tf.margin_right = Emu(0)
+        elif ir_text.block.alignment == PP_ALIGN.RIGHT:
+            tf.margin_left = Emu(0)
+            tf.margin_right = max(Emu(0), (rect_x + rect_w) - text_x)
+        else:
+            diff = text_x - (rect_x + rect_w / 2)
+            if diff > 0:
+                tf.margin_left = Emu(int(diff * 2))
+                tf.margin_right = Emu(0)
+            else:
+                tf.margin_left = Emu(0)
+                tf.margin_right = Emu(int(-diff * 2))
+        
+        first_font_size = ir_text.block.runs[0].font.size_pt if ir_text.block.runs else 12
+        font_size_emu = Emu(int(first_font_size * 12700))
+        tf.margin_top = max(Emu(0), (text_y - rect_y) - font_size_emu)
+        tf.margin_bottom = Emu(0)
+
+        tf.vertical_anchor = MSO_ANCHOR.TOP
+        self._populate_textframe(tf, ir_text.block)
+
+    def _resolve_group_texts(self, ppt_shapes, text_children):
+        if text_children and ppt_shapes:
+            auto_shapes = [s for s in ppt_shapes if getattr(s, "has_text_frame", False)]
+            if auto_shapes:
+                biggest_shape = max(auto_shapes, key=lambda s: s.width * s.height)
+                main_txt = max(text_children, key=lambda t: sum(len(r.text) for r in t.block.runs))
+                
+                self._embed_text_in_shape(biggest_shape, main_txt)
+                
+                for txt in text_children:
+                    if txt is not main_txt:
+                        tb = self._render_text_freeform(txt)
+                        if tb:
+                            ppt_shapes.append(tb)
+                return ppt_shapes
+        
+        for txt in text_children:
+            tb = self._render_text_freeform(txt)
+            if tb:
+                ppt_shapes.append(tb)
+        return ppt_shapes
+
     def _render_group(self, group: IRGroup):
         ppt_shapes = []
-        for child in group.children:
+        
+        text_children = [c for c in group.children if isinstance(c, IRText)]
+        other_children = [c for c in group.children if not isinstance(c, IRText)]
+
+        for child in other_children:
             shape = self._dispatch_shape(child)
             if shape:
                 ppt_shapes.append(shape)
+
+        ppt_shapes = self._resolve_group_texts(ppt_shapes, text_children)
                 
         ppt_shapes = [s for s in ppt_shapes if s is not None]
         if len(ppt_shapes) > 1:
@@ -122,7 +155,7 @@ class PPTXBackend:
                 self._disable_shadow(g)
                 result = g
             except Exception as e:
-                print(f"Warning: could not group shapes: {e}")
+                logger.warning("Could not group shapes: %s", e)
                 return None
         elif len(ppt_shapes) == 1:
             result = ppt_shapes[0]
@@ -155,46 +188,7 @@ class PPTXBackend:
             if shape:
                 ppt_shapes.append(shape)
 
-        if text_children:
-            main_txt = max(text_children, key=lambda t: sum(len(r.text) for r in t.block.runs))
-            
-            tf = rect_shape.text_frame
-            tf.clear()
-            tf.word_wrap = True
-            
-            rect_x = box.rectangle.geometry.x
-            rect_y = box.rectangle.geometry.y
-            rect_w = box.rectangle.geometry.width
-            text_x = main_txt.block.anchor_x
-            text_y = main_txt.block.anchor_y
-            
-            if main_txt.block.alignment == PP_ALIGN.LEFT:
-                tf.margin_left = max(Emu(0), text_x - rect_x)
-                tf.margin_right = Emu(0)
-            elif main_txt.block.alignment == PP_ALIGN.RIGHT:
-                tf.margin_left = Emu(0)
-                tf.margin_right = max(Emu(0), (rect_x + rect_w) - text_x)
-            else:
-                diff = text_x - (rect_x + rect_w / 2)
-                if diff > 0:
-                    tf.margin_left = Emu(int(diff * 2))
-                    tf.margin_right = Emu(0)
-                else:
-                    tf.margin_left = Emu(0)
-                    tf.margin_right = Emu(int(-diff * 2))
-            
-            first_font_size = main_txt.block.runs[0].font.size_pt if main_txt.block.runs else 12
-            font_size_emu = Emu(int(first_font_size * 12700))
-            tf.margin_top = max(Emu(0), (text_y - rect_y) - font_size_emu)
-            tf.margin_bottom = Emu(0)
-
-            tf.vertical_anchor = MSO_ANCHOR.TOP
-            self._populate_textframe(tf, main_txt.block)
-
-            for txt in text_children:
-                if txt is not main_txt:
-                    tb = self._render_text_freeform(txt)
-                    ppt_shapes.append(tb)
+        ppt_shapes = self._resolve_group_texts(ppt_shapes, text_children)
 
         ppt_shapes = [s for s in ppt_shapes if s is not None]
         if len(ppt_shapes) > 1:
@@ -203,7 +197,7 @@ class PPTXBackend:
                 self._disable_shadow(g)
                 return g
             except Exception as e:
-                print(f"Warning: could not group shapes: {e}")
+                logger.warning("Could not group shapes: %s", e)
                 return None
         elif len(ppt_shapes) == 1:
             return ppt_shapes[0]
@@ -236,6 +230,9 @@ class PPTXBackend:
         else:
             shape.line.fill.background()
 
+        if rect.dashed:
+            self._apply_dash(shape)
+
         self._disable_shadow(shape)
 
         shape.text_frame.text = ""
@@ -263,6 +260,9 @@ class PPTXBackend:
             shape.line.width = max(el.stroke_width_emu, 1)
         else:
             shape.line.fill.background()
+
+        if el.dashed:
+            self._apply_dash(shape)
 
         self._disable_shadow(shape)
         shape.text_frame.text = ""
@@ -298,6 +298,9 @@ class PPTXBackend:
             shape.line.width = max(poly.stroke_width_emu, 1)
         else:
             shape.line.fill.background()
+
+        if poly.dashed:
+            self._apply_dash(shape)
 
         self._disable_shadow(shape)
         
@@ -353,7 +356,7 @@ class PPTXBackend:
             approx_width = min(est_width, txt.container_geometry.width)
             approx_height = est_height
         else:
-            approx_width = min(est_width, Emu(int(self.ir.width_emu * 0.9)))
+            approx_width = min(est_width, Emu(int(self.current_ir_slide.width_emu * 0.9)))
             approx_height = est_height
 
         if block.alignment == PP_ALIGN.CENTER:

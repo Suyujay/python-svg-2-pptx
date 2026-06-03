@@ -1,0 +1,121 @@
+{
+  "width_emu": 12192000,
+  "height_emu": 6858000,
+  "nodes": [
+    {
+      "rectangle": {
+        "geometry": {
+          "x": 1270000,
+          "y": 1270000,
+          "width": 3810000,
+          "height": 2540000,
+          "__type__": "Geometry"
+        },
+        "fill": {
+          "r": 255,
+          "g": 255,
+          "b": 255,
+          "__type__": "Color"
+        },
+        "stroke": {
+          "r": 26,
+          "g": 115,
+          "b": 232,
+          "__type__": "Color"
+        },
+        "stroke_width_emu": 25400,
+        "corner_radius_emu": 101600,
+        "dashed": true,
+        "shape_id": "arch-box",
+        "__type__": "IRRectangle"
+      },
+      "children": [
+        {
+          "block": {
+            "runs": [
+              {
+                "text": "Service Architecture",
+                "font": {
+                  "family": "Arial",
+                  "size_pt": 20.0,
+                  "bold": true,
+                  "italic": false,
+                  "color": {
+                    "r": 26,
+                    "g": 115,
+                    "b": 232,
+                    "__type__": "Color"
+                  },
+                  "__type__": "FontStyle"
+                },
+                "line_break_before": false,
+                "__type__": "TextRun"
+              }
+            ],
+            "anchor_x": 1524000,
+            "anchor_y": 1651000,
+            "alignment": 1,
+            "__type__": "TextBlock"
+          },
+          "container_geometry": {
+            "x": 1270000,
+            "y": 1270000,
+            "width": 3810000,
+            "height": 2540000,
+            "__type__": "Geometry"
+          },
+          "__type__": "IRText"
+        },
+        {
+          "block": {
+            "runs": [
+              {
+                "text": "Provides REST APIs",
+                "font": {
+                  "family": "Arial",
+                  "size_pt": 12.0,
+                  "bold": false,
+                  "italic": false,
+                  "color": {
+                    "r": 95,
+                    "g": 99,
+                    "b": 104,
+                    "__type__": "Color"
+                  },
+                  "__type__": "FontStyle"
+                },
+                "line_break_before": false,
+                "__type__": "TextRun"
+              }
+            ],
+            "anchor_x": 1524000,
+            "anchor_y": 2032000,
+            "alignment": 1,
+            "__type__": "TextBlock"
+          },
+          "container_geometry": {
+            "x": 1270000,
+            "y": 1270000,
+            "width": 3810000,
+            "height": 2540000,
+            "__type__": "Geometry"
+          },
+          "__type__": "IRText"
+        },
+        {
+          "geometry": {
+            "x": 1524000,
+            "y": 2286000,
+            "width": 812800,
+            "height": 812800,
+            "__type__": "Geometry"
+          },
+          "svg_bytes": "<ns0:svg xmlns:ns0=\"http://www.w3.org/2000/svg\" width=\"64.0\" height=\"64.0\" viewBox=\"0 0 24 24\">\n      <ns0:path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z\" fill=\"#34a853\" />\n    </ns0:svg>",
+          "__type__": "IRIcon"
+        }
+      ],
+      "__type__": "IRInfoBox"
+    }
+  ],
+  "__type__": "IRSlide"
+}

@@ -1,0 +1,228 @@
+{
+  "width_emu": 12192000,
+  "height_emu": 6858000,
+  "nodes": [
+    {
+      "rectangle": {
+        "geometry": {
+          "x": 1270000,
+          "y": 1270000,
+          "width": 1270000,
+          "height": 635000,
+          "__type__": "Geometry"
+        },
+        "fill": {
+          "r": 238,
+          "g": 238,
+          "b": 238,
+          "__type__": "Color"
+        },
+        "stroke": {
+          "r": 51,
+          "g": 51,
+          "b": 51,
+          "__type__": "Color"
+        },
+        "stroke_width_emu": 12700,
+        "corner_radius_emu": 0,
+        "dashed": false,
+        "shape_id": "obj1",
+        "__type__": "IRRectangle"
+      },
+      "children": [
+        {
+          "block": {
+            "runs": [
+              {
+                "text": "Obj1",
+                "font": {
+                  "family": "Calibri",
+                  "size_pt": 12.0,
+                  "bold": false,
+                  "italic": false,
+                  "color": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0,
+                    "__type__": "Color"
+                  },
+                  "__type__": "FontStyle"
+                },
+                "line_break_before": false,
+                "__type__": "TextRun"
+              }
+            ],
+            "anchor_x": 1524000,
+            "anchor_y": 1651000,
+            "alignment": 1,
+            "__type__": "TextBlock"
+          },
+          "container_geometry": {
+            "x": 1270000,
+            "y": 1270000,
+            "width": 1270000,
+            "height": 635000,
+            "__type__": "Geometry"
+          },
+          "__type__": "IRText"
+        }
+      ],
+      "__type__": "IRInfoBox"
+    },
+    {
+      "rectangle": {
+        "geometry": {
+          "x": 5080000,
+          "y": 1270000,
+          "width": 1270000,
+          "height": 635000,
+          "__type__": "Geometry"
+        },
+        "fill": {
+          "r": 238,
+          "g": 238,
+          "b": 238,
+          "__type__": "Color"
+        },
+        "stroke": {
+          "r": 51,
+          "g": 51,
+          "b": 51,
+          "__type__": "Color"
+        },
+        "stroke_width_emu": 12700,
+        "corner_radius_emu": 0,
+        "dashed": false,
+        "shape_id": "obj2",
+        "__type__": "IRRectangle"
+      },
+      "children": [
+        {
+          "block": {
+            "runs": [
+              {
+                "text": "Obj2",
+                "font": {
+                  "family": "Calibri",
+                  "size_pt": 12.0,
+                  "bold": false,
+                  "italic": false,
+                  "color": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0,
+                    "__type__": "Color"
+                  },
+                  "__type__": "FontStyle"
+                },
+                "line_break_before": false,
+                "__type__": "TextRun"
+              }
+            ],
+            "anchor_x": 5334000,
+            "anchor_y": 1651000,
+            "alignment": 1,
+            "__type__": "TextBlock"
+          },
+          "container_geometry": {
+            "x": 5080000,
+            "y": 1270000,
+            "width": 1270000,
+            "height": 635000,
+            "__type__": "Geometry"
+          },
+          "__type__": "IRText"
+        }
+      ],
+      "__type__": "IRInfoBox"
+    },
+    {
+      "connector_type": "straight",
+      "waypoints": [
+        {
+          "x": 2540000,
+          "y": 1587500,
+          "__type__": "Point"
+        },
+        {
+          "x": 5080000,
+          "y": 1587500,
+          "__type__": "Point"
+        }
+      ],
+      "stroke": {
+        "r": 25,
+        "g": 118,
+        "b": 210,
+        "__type__": "Color"
+      },
+      "stroke_width_emu": 25400,
+      "dashed": false,
+      "start_arrow": "none",
+      "end_arrow": "triangle",
+      "start_ref": "obj1",
+      "end_ref": "obj2",
+      "__type__": "IRConnector"
+    },
+    {
+      "connector_type": "elbow",
+      "waypoints": [
+        {
+          "x": 1905000,
+          "y": 1905000,
+          "__type__": "Point"
+        },
+        {
+          "x": 1905000,
+          "y": 2857500,
+          "__type__": "Point"
+        },
+        {
+          "x": 5715000,
+          "y": 2857500,
+          "__type__": "Point"
+        },
+        {
+          "x": 5715000,
+          "y": 1905000,
+          "__type__": "Point"
+        }
+      ],
+      "stroke": {
+        "r": 211,
+        "g": 47,
+        "b": 47,
+        "__type__": "Color"
+      },
+      "stroke_width_emu": 38100,
+      "dashed": true,
+      "start_arrow": "none",
+      "end_arrow": "triangle",
+      "start_ref": "obj1",
+      "end_ref": "obj2",
+      "__type__": "IRConnector"
+    },
+    {
+      "start": {
+        "x": 1270000,
+        "y": 2540000,
+        "__type__": "Point"
+      },
+      "end": {
+        "x": 3810000,
+        "y": 2540000,
+        "__type__": "Point"
+      },
+      "stroke": {
+        "r": 123,
+        "g": 31,
+        "b": 162,
+        "__type__": "Color"
+      },
+      "stroke_width_emu": 50800,
+      "dashed": true,
+      "__type__": "IRLine"
+    }
+  ],
+  "__type__": "IRSlide"
+}

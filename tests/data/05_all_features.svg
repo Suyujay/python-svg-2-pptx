@@ -1,0 +1,38 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background / Box -->
+  <g data-element-type="infoBox" id="main-system">
+    <rect x="50" y="50" width="860" height="440" rx="10" fill="#f8f9fa" stroke="#5f6368" stroke-width="2" stroke-dasharray="6,4" />
+    <text x="70" y="80" font-family="Arial" font-size="24" font-weight="bold">Core System</text>
+    
+    <!-- Shape 1 -->
+    <g data-element-type="infoBox" id="module-a">
+      <rect x="100" y="150" width="150" height="100" rx="5" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" />
+      <text x="120" y="180" font-weight="bold">Module A</text>
+      <ellipse cx="175" cy="210" rx="20" ry="10" fill="#ea4335" />
+    </g>
+
+    <!-- Shape 2 -->
+    <g data-element-type="infoBox" id="module-b">
+      <rect x="400" y="150" width="150" height="100" rx="5" fill="#e6f4ea" stroke="#34a853" stroke-width="2" />
+      <text x="420" y="180" font-weight="bold">Module B</text>
+    </g>
+  </g>
+
+  <!-- Connection -->
+  <line data-element-type="connector" data-connector-type="straight" x1="250" y1="200" x2="400" y2="200" stroke="#fbbc04" stroke-width="3" stroke-dasharray="2,2" data-start="module-a" data-end="module-b" marker-end="url(#arrow)" />
+  
+  <!-- Polyline connector -->
+  <polyline data-element-type="connector" data-connector-type="elbow" points="475,250 475,400 175,400 175,250" stroke="#ea4335" stroke-width="2" data-start="module-b" data-end="module-a" marker-end="url(#arrow)" />
+  
+  <!-- Standalone Polygon -->
+  <polygon points="700,200 750,150 800,200 750,250" fill="#fce8e6" stroke="#ea4335" stroke-width="2" />
+  
+  <!-- Text variations -->
+  <text x="700" y="300" font-family="Times New Roman" font-size="14" font-style="italic">
+    <tspan x="700" dy="0">Polygon</tspan>
+    <tspan x="700" dy="18">Shape</tspan>
+  </text>
+  
+  <!-- Decoration -->
+  <line x1="600" y1="350" x2="850" y2="350" stroke="#000000" stroke-width="1" />
+</svg>

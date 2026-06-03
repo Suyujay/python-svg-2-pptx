@@ -1,12 +1,15 @@
 import os
 import json
+import logging
 import dataclasses
 from enum import Enum
 from pathlib import Path
-from typing import Union
+from typing import Union, List
 
 from .parser import SVGParser
 from .generator import PPTXBackend
+
+logger = logging.getLogger(__name__)
 
 class _IRJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -20,7 +23,62 @@ class _IRJSONEncoder(json.JSONEncoder):
             return obj.decode("utf-8", errors="replace")
         return super().default(obj)
 
+
+def _ir_object_hook(d):
+    """Deserialize JSON dictionary back into IRNode dataclasses based on __type__."""
+    if "__type__" not in d:
+        return d
+        
+    from . import models
+    from pptx.enum.text import PP_ALIGN
+    
+    d_copy = d.copy()
+    cls_name = d_copy.pop("__type__")
+    
+    if hasattr(models, cls_name):
+        node_cls = getattr(models, cls_name)
+    else:
+        return d
+        
+    try:
+        fields = dataclasses.fields(node_cls)
+        import typing
+        hints = typing.get_type_hints(node_cls)
+    except TypeError:
+        return d
+        
+    kwargs = {}
+    for f in fields:
+        if f.name in d_copy:
+            val = d_copy[f.name]
+            
+            # Reconstruct enums
+            if f.name == "alignment" and val is not None:
+                try:
+                    val = PP_ALIGN(val)
+                except ValueError:
+                    pass
+            elif f.name == "connector_type" and val is not None:
+                val = models.ConnectorType(val)
+            elif f.name in ("start_arrow", "end_arrow") and val is not None:
+                val = models.ArrowType(val)
+                
+            # Cast list to tuple if field type is Tuple
+            if isinstance(val, list):
+                f_type = hints.get(f.name)
+                if typing.get_origin(f_type) is tuple:
+                    val = tuple(val)
+            
+            # Cast string to bytes if field type is bytes
+            if isinstance(val, str) and hints.get(f.name) is bytes:
+                val = val.encode("utf-8")
+                
+            kwargs[f.name] = val
+            
+    return node_cls(**kwargs)
+
 class SVG2Pptx:
+
     """Main class for converting SVG to PowerPoint."""
     
     # Centralized configuration and constants
@@ -38,46 +96,98 @@ class SVG2Pptx:
         self.slide_height_emu = slide_height_emu or self.SLIDE_HEIGHT_EMU
         self.svg_ns = svg_ns or self.SVG_NS
     
-    def convert(self, svg_input: Union[str, Path], output_path: Union[str, Path]) -> None:
-        """
-        Convert an SVG string or file to a PPTX presentation and JSON output.
-        
-        Args:
-            svg_input: Either an SVG string format or a path to an SVG file.
-            output_path: Path where the output .pptx should be saved.
-                         A corresponding .json file will also be created.
-        """
-        svg_source = ""
+    def _get_svg_source(self, svg_input: Union[str, Path]) -> str:
         if isinstance(svg_input, (str, Path)):
             try:
-                # Try to check if it's a file path
                 if os.path.isfile(svg_input):
                     with open(svg_input, "r", encoding="utf-8") as f:
-                        svg_source = f.read()
-                else:
-                    svg_source = str(svg_input)
+                        return f.read()
             except Exception:
-                # If path too long or invalid, treat as string
-                svg_source = str(svg_input)
-        else:
-            raise TypeError("svg_input must be a string containing SVG content or a file path.")
+                pass
+            return str(svg_input)
+        raise TypeError("svg_input must be a string containing SVG content or a file path.")
 
-        ir = SVGParser(
-            svg_source,
-            slide_width=self.slide_width_emu,
-            slide_height=self.slide_height_emu,
-            svg_ns=self.svg_ns
-        ).parse()
+    def to_json(self, svg_input: Union[str, Path, List[Union[str, Path]]], indent: int = 2) -> str:
+        """
+        Convert an SVG string or file (or list of them) to its JSON IR representation string.
+        """
+        if not isinstance(svg_input, list):
+            svg_input = [svg_input]
+            
+        irs = []
+        for inp in svg_input:
+            svg_source = self._get_svg_source(inp)
+            ir = SVGParser(
+                svg_source,
+                slide_width=self.slide_width_emu,
+                slide_height=self.slide_height_emu,
+                svg_ns=self.svg_ns
+            ).parse()
+            irs.append(ir)
+            
+        # Return a single object if only one was passed, else return list
+        return json.dumps(irs[0] if len(irs) == 1 else irs, cls=_IRJSONEncoder, indent=indent)
+
+    def convert(self, svg_input: Union[str, Path, List[Union[str, Path]]], output_path: Union[str, Path], export_as_json: bool = False) -> None:
+        """
+        Convert an SVG string or file (or list of them) to a PPTX presentation and JSON output.
         
+        Args:
+            svg_input: Either an SVG string format or a path to an SVG file, or a list of such.
+            output_path: Path where the output .pptx should be saved.
+                         A corresponding .json file will also be created.
+            export_as_json: If True, only export the JSON IR without creating a PPTX file.
+        """
+        if not isinstance(svg_input, list):
+            svg_input = [svg_input]
+
+        irs = []
+        for inp in svg_input:
+            svg_source = self._get_svg_source(inp)
+            ir = SVGParser(
+                svg_source,
+                slide_width=self.slide_width_emu,
+                slide_height=self.slide_height_emu,
+                svg_ns=self.svg_ns
+            ).parse()
+            irs.append(ir)
+        
+        if export_as_json:
+            self.export_ir_to_json(output_path, irs)
+            
+        prs = PPTXBackend(irs).render()
+        prs.save(str(output_path))
+        logger.info(f"Wrote PPTX to %s", output_path)
+
+        return str(output_path)
+
+    def export_ir_to_json(self, output_path, ir):
         output_path_str = str(output_path)
         json_path = output_path_str.replace(".pptx", ".json")
         if json_path == output_path_str:
             json_path += ".json"
             
         with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(ir, f, cls=_IRJSONEncoder, indent=2)
-        print(f"[OK] Wrote JSON IR to {json_path}")
+            # Drop the list wrapping if it's a single item for backwards compat.
+            output_data = ir[0] if isinstance(ir, list) and len(ir) == 1 else ir
+            json.dump(output_data, f, cls=_IRJSONEncoder, indent=2)
+        logger.info(f"Wrote JSON IR to %s", json_path)
 
+    def from_json(self, json_input: Union[str, Path], output_path: Union[str, Path]) -> str:
+        """
+        Import an IRSlide (or list of IRSlides) from a JSON string or file path and convert it to PPTX.
+        
+        Args:
+            json_input: Either a JSON string containing IR representation or a path to a JSON file.
+            output_path: Path where the output .pptx should be saved.
+        """
+        if isinstance(json_input, (str, Path)) and os.path.isfile(str(json_input)):
+            with open(json_input, "r", encoding="utf-8") as f:
+                ir = json.load(f, object_hook=_ir_object_hook)
+        else:
+            ir = json.loads(str(json_input), object_hook=_ir_object_hook)
+            
         prs = PPTXBackend(ir).render()
-        prs.save(output_path_str)
-        print(f"[OK] Wrote PPTX to {output_path_str}")
+        prs.save(str(output_path))
+        logger.info(f"Wrote PPTX to %s", output_path)
+        return str(output_path)

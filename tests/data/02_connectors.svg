@@ -1,0 +1,13 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">
+  <g data-element-type="infoBox" id="obj1">
+    <rect x="100" y="100" width="100" height="50" fill="#eeeeee" stroke="#333333" />
+    <text x="120" y="130">Obj1</text>
+  </g>
+  <g data-element-type="infoBox" id="obj2">
+    <rect x="400" y="100" width="100" height="50" fill="#eeeeee" stroke="#333333" />
+    <text x="420" y="130">Obj2</text>
+  </g>
+  <line data-element-type="connector" data-connector-type="straight" x1="200" y1="125" x2="400" y2="125" stroke="#1976d2" stroke-width="2" data-start="obj1" data-end="obj2" marker-end="url(#arrow)" />
+  <polyline data-element-type="connector" data-connector-type="elbow" points="150,150 150,225 450,225 450,150" stroke="#d32f2f" stroke-width="3" stroke-dasharray="8,4" data-start="obj1" data-end="obj2" marker-end="url(#arrow)" />
+  <line x1="100" y1="200" x2="300" y2="200" stroke="#7b1fa2" stroke-width="4" stroke-dasharray="4,4" />
+</svg>

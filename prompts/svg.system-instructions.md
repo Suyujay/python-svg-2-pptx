@@ -62,6 +62,7 @@ Example:
 - Styling Format: Use presentation attributes (e.g., fill="#333", stroke="#666") ONLY. Do NOT use inline CSS (style="...") or <style> blocks.
 - Color Syntax: Use 3 or 6-digit hex colors only. Avoid color names ("red"), rgb(), or rgba().
 - Transparency: For opacity, use explicit `fill-opacity="..."` or `stroke-opacity="..."` attributes (values 0.0 to 1.0). Do not use 8-digit hex codes.
+- Use <g> grouping to identify texts that are part of shapes
 
 # Final Constraint
 Provide raw SVG directly. No markdown ticks, no conversational text.

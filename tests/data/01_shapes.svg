@@ -1,0 +1,7 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">
+  <rect x="50" y="50" width="150" height="100" fill="#ffcccb" stroke="#d32f2f" stroke-width="3" />
+  <rect x="250" y="50" width="150" height="100" rx="15" fill="#c8e6c9" stroke="#388e3c" stroke-width="2" stroke-dasharray="5,5" />
+  <circle cx="500" cy="100" r="50" fill="#bbdefb" stroke="#0288d1" stroke-width="4" />
+  <ellipse cx="650" cy="100" rx="60" ry="40" fill="#fff9c4" stroke="#fbc02d" stroke-width="2" stroke-dasharray="2,2" />
+  <polygon points="800,150 850,50 900,150" fill="#e1bee7" stroke="#fbc02d" stroke-width="2" />
+</svg>

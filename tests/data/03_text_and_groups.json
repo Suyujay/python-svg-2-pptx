@@ -1,0 +1,215 @@
+{
+  "width_emu": 12192000,
+  "height_emu": 6858000,
+  "nodes": [
+    {
+      "block": {
+        "runs": [
+          {
+            "text": "Heading Text",
+            "font": {
+              "family": "Arial",
+              "size_pt": 24.0,
+              "bold": true,
+              "italic": false,
+              "color": {
+                "r": 0,
+                "g": 0,
+                "b": 0,
+                "__type__": "Color"
+              },
+              "__type__": "FontStyle"
+            },
+            "line_break_before": false,
+            "__type__": "TextRun"
+          }
+        ],
+        "anchor_x": 635000,
+        "anchor_y": 1270000,
+        "alignment": 1,
+        "__type__": "TextBlock"
+      },
+      "container_geometry": null,
+      "__type__": "IRText"
+    },
+    {
+      "block": {
+        "runs": [
+          {
+            "text": "Italic Subheading",
+            "font": {
+              "family": "Calibri",
+              "size_pt": 16.0,
+              "bold": false,
+              "italic": false,
+              "color": {
+                "r": 85,
+                "g": 85,
+                "b": 85,
+                "__type__": "Color"
+              },
+              "__type__": "FontStyle"
+            },
+            "line_break_before": false,
+            "__type__": "TextRun"
+          }
+        ],
+        "anchor_x": 635000,
+        "anchor_y": 1905000,
+        "alignment": 1,
+        "__type__": "TextBlock"
+      },
+      "container_geometry": null,
+      "__type__": "IRText"
+    },
+    {
+      "block": {
+        "runs": [
+          {
+            "text": "This is a multi-line",
+            "font": {
+              "family": "Segoe UI",
+              "size_pt": 14.0,
+              "bold": false,
+              "italic": false,
+              "color": {
+                "r": 17,
+                "g": 17,
+                "b": 17,
+                "__type__": "Color"
+              },
+              "__type__": "FontStyle"
+            },
+            "line_break_before": false,
+            "__type__": "TextRun"
+          },
+          {
+            "text": "text block demonstrating",
+            "font": {
+              "family": "Segoe UI",
+              "size_pt": 14.0,
+              "bold": false,
+              "italic": false,
+              "color": {
+                "r": 17,
+                "g": 17,
+                "b": 17,
+                "__type__": "Color"
+              },
+              "__type__": "FontStyle"
+            },
+            "line_break_before": true,
+            "__type__": "TextRun"
+          },
+          {
+            "text": "element spacing (tspan).",
+            "font": {
+              "family": "Segoe UI",
+              "size_pt": 14.0,
+              "bold": false,
+              "italic": false,
+              "color": {
+                "r": 17,
+                "g": 17,
+                "b": 17,
+                "__type__": "Color"
+              },
+              "__type__": "FontStyle"
+            },
+            "line_break_before": true,
+            "__type__": "TextRun"
+          }
+        ],
+        "anchor_x": 635000,
+        "anchor_y": 2540000,
+        "alignment": 1,
+        "__type__": "TextBlock"
+      },
+      "container_geometry": null,
+      "__type__": "IRText"
+    },
+    {
+      "children": [
+        {
+          "geometry": {
+            "x": 3810000,
+            "y": 1270000,
+            "width": 2540000,
+            "height": 1905000,
+            "__type__": "Geometry"
+          },
+          "fill": {
+            "r": 245,
+            "g": 245,
+            "b": 245,
+            "__type__": "Color"
+          },
+          "stroke": {
+            "r": 204,
+            "g": 204,
+            "b": 204,
+            "__type__": "Color"
+          },
+          "stroke_width_emu": 12700,
+          "corner_radius_emu": 0,
+          "dashed": false,
+          "shape_id": null,
+          "__type__": "IRRectangle"
+        },
+        {
+          "geometry": {
+            "x": 4572000,
+            "y": 1714500,
+            "width": 1016000,
+            "height": 1016000,
+            "__type__": "Geometry"
+          },
+          "fill": {
+            "r": 255,
+            "g": 235,
+            "b": 59,
+            "__type__": "Color"
+          },
+          "stroke": null,
+          "stroke_width_emu": 12700,
+          "dashed": false,
+          "shape_id": null,
+          "__type__": "IREllipse"
+        },
+        {
+          "block": {
+            "runs": [
+              {
+                "text": "Grouped",
+                "font": {
+                  "family": "Calibri",
+                  "size_pt": 12.0,
+                  "bold": true,
+                  "italic": false,
+                  "color": {
+                    "r": 0,
+                    "g": 0,
+                    "b": 0,
+                    "__type__": "Color"
+                  },
+                  "__type__": "FontStyle"
+                },
+                "line_break_before": false,
+                "__type__": "TextRun"
+              }
+            ],
+            "anchor_x": 4572000,
+            "anchor_y": 2286000,
+            "alignment": 1,
+            "__type__": "TextBlock"
+          },
+          "container_geometry": null,
+          "__type__": "IRText"
+        }
+      ],
+      "shape_id": "my-group",
+      "__type__": "IRGroup"
+    }
+  ],
+  "__type__": "IRSlide"
+}

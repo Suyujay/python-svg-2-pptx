@@ -1,0 +1,145 @@
+{
+  "width_emu": 12192000,
+  "height_emu": 6858000,
+  "nodes": [
+    {
+      "geometry": {
+        "x": 635000,
+        "y": 635000,
+        "width": 1905000,
+        "height": 1270000,
+        "__type__": "Geometry"
+      },
+      "fill": {
+        "r": 255,
+        "g": 204,
+        "b": 203,
+        "__type__": "Color"
+      },
+      "stroke": {
+        "r": 211,
+        "g": 47,
+        "b": 47,
+        "__type__": "Color"
+      },
+      "stroke_width_emu": 38100,
+      "corner_radius_emu": 0,
+      "dashed": false,
+      "shape_id": null,
+      "__type__": "IRRectangle"
+    },
+    {
+      "geometry": {
+        "x": 3175000,
+        "y": 635000,
+        "width": 1905000,
+        "height": 1270000,
+        "__type__": "Geometry"
+      },
+      "fill": {
+        "r": 200,
+        "g": 230,
+        "b": 201,
+        "__type__": "Color"
+      },
+      "stroke": {
+        "r": 56,
+        "g": 142,
+        "b": 60,
+        "__type__": "Color"
+      },
+      "stroke_width_emu": 25400,
+      "corner_radius_emu": 190500,
+      "dashed": true,
+      "shape_id": null,
+      "__type__": "IRRectangle"
+    },
+    {
+      "geometry": {
+        "x": 5715000,
+        "y": 635000,
+        "width": 1270000,
+        "height": 1270000,
+        "__type__": "Geometry"
+      },
+      "fill": {
+        "r": 187,
+        "g": 222,
+        "b": 251,
+        "__type__": "Color"
+      },
+      "stroke": {
+        "r": 2,
+        "g": 136,
+        "b": 209,
+        "__type__": "Color"
+      },
+      "stroke_width_emu": 50800,
+      "dashed": false,
+      "shape_id": null,
+      "__type__": "IREllipse"
+    },
+    {
+      "geometry": {
+        "x": 7493000,
+        "y": 762000,
+        "width": 1524000,
+        "height": 1016000,
+        "__type__": "Geometry"
+      },
+      "fill": {
+        "r": 255,
+        "g": 249,
+        "b": 196,
+        "__type__": "Color"
+      },
+      "stroke": {
+        "r": 251,
+        "g": 192,
+        "b": 45,
+        "__type__": "Color"
+      },
+      "stroke_width_emu": 25400,
+      "dashed": true,
+      "shape_id": null,
+      "__type__": "IREllipse"
+    },
+    {
+      "waypoints": [
+        {
+          "x": 10160000,
+          "y": 1905000,
+          "__type__": "Point"
+        },
+        {
+          "x": 10795000,
+          "y": 635000,
+          "__type__": "Point"
+        },
+        {
+          "x": 11430000,
+          "y": 1905000,
+          "__type__": "Point"
+        }
+      ],
+      "is_closed": true,
+      "fill": {
+        "r": 225,
+        "g": 190,
+        "b": 231,
+        "__type__": "Color"
+      },
+      "stroke": {
+        "r": 251,
+        "g": 192,
+        "b": 45,
+        "__type__": "Color"
+      },
+      "stroke_width_emu": 25400,
+      "dashed": false,
+      "shape_id": null,
+      "__type__": "IRPolygon"
+    }
+  ],
+  "__type__": "IRSlide"
+}
