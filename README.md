@@ -2,23 +2,6 @@
 
 A high-fidelity, two-pass compiler that translates structured SVG metadata into native PowerPoint (`.pptx`) presentations. It uses a strictly decoupled Intermediate Representation (IR) layer to bridge SVG semantics with PowerPoint's DrawingML.
 
-## SVG Requirements & Schema
-
-The compiler expects SVG files to conform to specific structural and metadata rules to guide the transformation properly:
-
-### Canvas & Styling
-- **Dimensions**: Fixed 16:9 aspect ratio is recommended (e.g., `viewBox="0 0 960 540" width="100%" height="100%"`).
-- **Styling**: Use presentation attributes (`fill="#FF5733"`, `stroke="#e0e0e0"`) ONLY. Do **not** use inline CSS (`style="..."`) or `<style>` blocks.
-- **Colors & Transparency**: Use 3 or 6-digit hex colors. For opacity, use explicit `fill-opacity="..."` or `stroke-opacity="..."` attributes (0.0 to 1.0) rather than 8-digit hex codes.
-- **Typography**: Use standard fonts only (e.g., Arial, Calibri, Segoe UI). Use `<tspan>` for rich text formatting.
-
-### Structural Rules
-- **InfoBox (`data-element-type="infoBox"`)**: Wrap logical components in `<g id="[unique_id]" data-element-type="infoBox">`.
-- **Connectors (`data-element-type="connector"`)**: Must be kept isolated at the root level (never nested inside other `<g>` groups) as `<line>` or `<polyline>`.
-  - **Required attributes**: `data-start="[source_id]"`, `data-end="[target_id]"`, `data-connector-type="straight|elbow|curve"`.
-  - **Arrowheads**: Supported via `marker-start` and `marker-end` attributes referencing standard marker defs (`none`, `arrow`, `diamond`, `stealth`).
-- **Icons (`data-element-type="icon"`)**: Isolate inside a group and nest a child `<svg>` with explicit `x`, `y`, `width`, `height`, and `viewBox` attributes.
-
 ## Features
 
 - **Decoupled Architecture**: Separate Frontend (Parser), IR Layer, and Backend (Generator).
@@ -131,6 +114,24 @@ You can use the provided run script to process SVG files in the `data/` director
 python scripts/run.py
 ```
 
+### SVG Metadata Schema & Requirements
+
+The compiler expects SVG files to conform to specific structural and metadata rules to guide the transformation properly:
+
+#### Canvas & Styling
+- **Dimensions**: SVG must have viewBox and full widht and height, e.g. `viewBox="0 0 960 540" width="100%" height="100%"`.
+- **Styling**: Use presentation attributes (`fill="#FF5733"`, `stroke="#e0e0e0"`) ONLY. Do **not** use inline CSS (`style="..."`) or `<style>` blocks.
+- **Colors & Transparency**: Use 3 or 6-digit hex colors. For opacity, use explicit `fill-opacity="..."` or `stroke-opacity="..."` attributes (0.0 to 1.0) rather than 8-digit hex codes.
+- **Typography**: Use standard fonts only (e.g., Arial, Calibri, Segoe UI). Use `<tspan>` for rich text formatting.
+
+#### Structural Rules
+- **InfoBox (`data-element-type="infoBox"`)**: Wrap logical components in `<g id="[unique_id]" data-element-type="infoBox">`.
+- **Connectors (`data-element-type="connector"`)**: Must be kept isolated at the root level (never nested inside other `<g>` groups) as `<line>` or `<polyline>`.
+  - **Required attributes**: `data-start="[source_id]"`, `data-end="[target_id]"`, `data-connector-type="straight|elbow|curve"`.
+  - **Arrowheads**: Supported via `marker-start` and `marker-end` attributes referencing standard marker defs (`none`, `arrow`, `diamond`, `stealth`).
+- **Icons (`data-element-type="icon"`)**: Isolate inside a group and nest a child `<svg>` with explicit `x`, `y`, `width`, `height`, and `viewBox` attributes.
+
 ## License
 
 This project is licensed under the MIT License.
+
