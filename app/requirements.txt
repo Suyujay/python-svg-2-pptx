@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+python-pptx
+lxml
+surquest-fastapi-utils
+surquest-utils-svg2pptx
+PyYAML
+-e .
