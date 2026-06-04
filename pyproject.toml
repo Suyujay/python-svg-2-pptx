@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "surquest-utils-svg2pptx"
-version = "0.0.1"
+version = "0.0.2"
 description = "A high-fidelity, two-pass compiler that translates structured SVG metadata into native PowerPoint (.pptx) presentations."
 authors = [
     {name= "surQuest", email= "info@surquest.com"}

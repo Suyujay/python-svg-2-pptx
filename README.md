@@ -14,25 +14,31 @@ A high-fidelity, two-pass compiler that translates structured SVG metadata into 
 - **Styling Preservation**: Handles hex colors, CSS color names (e.g., `orange`, `blue`), stroke widths, corner radii, and translucency (alpha).
 - **Logging Implementation**: Uses standard Python `logging` module for production-ready monitoring.
 
-## Project Structure
+## SVG Metadata Schema & Requirements
 
-```text
-src/surquest/utils/svg2pptx/
-├── parser.py           # SVG Parser (Frontend)
-├── generator.py        # PPTX Generator (Backend)
-├── svg2pptx.py         # Main entry point and orchestration
-├── models/             # Intermediate Representation (IR) Layer
-```
+The compiler expects SVG files to conform to specific structural and metadata rules to guide the transformation properly:
 
-## Installation
+#### Canvas & Styling
+- **Dimensions**: SVG must have viewBox and full widht and height, e.g. `viewBox="0 0 960 540" width="100%" height="100%"`.
+- **Styling**: Use presentation attributes (`fill="#FF5733"`, `stroke="#e0e0e0"`) ONLY. Do **not** use inline CSS (`style="..."`) or `<style>` blocks.
+- **Colors & Transparency**: Use 3 or 6-digit hex colors. For opacity, use explicit `fill-opacity="..."` or `stroke-opacity="..."` attributes (0.0 to 1.0) rather than 8-digit hex codes.
+- **Typography**: Use standard fonts only (e.g., Arial, Calibri, Segoe UI). Use `<tspan>` for rich text formatting.
 
-Ensure you have the required dependencies:
+#### Structural Rules
+- **InfoBox (`data-element-type="infoBox"`)**: Wrap logical components in `<g id="[unique_id]" data-element-type="infoBox">`.
+- **Connectors (`data-element-type="connector"`)**: Must be kept isolated at the root level (never nested inside other `<g>` groups) as `<line>` or `<polyline>`.
+  - **Required attributes**: `data-start="[source_id]"`, `data-end="[target_id]"`, `data-connector-type="straight|elbow|curve"`.
+  - **Arrowheads**: Supported via `marker-start` and `marker-end` attributes referencing standard marker defs (`none`, `arrow`, `diamond`, `stealth`).
+- **Icons (`data-element-type="icon"`)**: Isolate inside a group and nest a child `<svg>` with explicit `x`, `y`, `width`, `height`, and `viewBox` attributes.
 
-```bash
-pip install python-pptx lxml
-```
 
 ## Usage
+
+### Installation
+
+```bash
+pip install surquest-utils-svg2pptx
+```
 
 ### Simple Conversion (Single Slide)
 
@@ -48,7 +54,6 @@ converter.convert(
     output_path="output.pptx"
 )
 ```
-
 ### Multi-Slide Conversion
 
 You can generate a multi-slide presentation by providing a list of SVG paths. The slides will be generated in the order provided.
@@ -62,6 +67,28 @@ converter.convert(
     output_path="multi_slide.pptx"
 )
 ```
+
+## Project Structure
+
+```text
+.
+├── data/               # Sample SVG and JSON IR files
+├── prompts/            # System instructions for LLM-based SVG generation
+├── scripts/            # Utility scripts (e.g., run.py)
+├── src/
+│   └── surquest/
+│       └── utils/
+│           └── svg2pptx/
+│               ├── generator/  # PPTX Generator (Backend)
+│               ├── models/     # Intermediate Representation (IR) Models
+│               ├── parser/     # SVG Parser (Frontend)
+│               └── svg2pptx.py # Orchestrator & Main API
+├── tests/              # Test suite (unit and integration tests)
+├── pyproject.toml      # Build and dependency configuration
+└── README.md
+```
+
+### Advanced Usage
 
 ### Exporting and Importing Intermediate Representation (JSON)
 
@@ -89,7 +116,7 @@ converter.from_json(
 )
 ```
 
-### Advanced Usage (Low-level API)
+### Low level APIs
 
 ```python
 from surquest.utils.svg2pptx.parser import SVGParser
@@ -106,6 +133,21 @@ prs.save("output.pptx")
 
 ## Development & Testing
 
+### Development Environment (VS Code Dev Container)
+
+This repository includes a [VS Code Dev Container](https://code.visualstudio.com/docs/devcontainers/containers) configuration to provide a consistent development environment. It uses Python 3.11 on Alpine Linux and comes pre-installed with all necessary C dependencies and Python packages (`python-pptx`, `lxml`, `pytest`, etc.).
+
+1.  Ensure you have [Docker](https://www.docker.com/) and the **Dev Containers** extension installed in VS Code.
+2.  Open the project in VS Code and click **Reopen in Container** when prompted (or use the Command Palette: `Dev Containers: Reopen in Container`).
+
+### Running Tests
+
+We use `pytest` for testing. You can run the full test suite with coverage reporting:
+
+```bash
+pytest tests/
+```
+
 ### Running the Example
 
 You can use the provided run script to process SVG files in the `data/` directory:
@@ -113,23 +155,6 @@ You can use the provided run script to process SVG files in the `data/` director
 ```bash
 python scripts/run.py
 ```
-
-### SVG Metadata Schema & Requirements
-
-The compiler expects SVG files to conform to specific structural and metadata rules to guide the transformation properly:
-
-#### Canvas & Styling
-- **Dimensions**: SVG must have viewBox and full widht and height, e.g. `viewBox="0 0 960 540" width="100%" height="100%"`.
-- **Styling**: Use presentation attributes (`fill="#FF5733"`, `stroke="#e0e0e0"`) ONLY. Do **not** use inline CSS (`style="..."`) or `<style>` blocks.
-- **Colors & Transparency**: Use 3 or 6-digit hex colors. For opacity, use explicit `fill-opacity="..."` or `stroke-opacity="..."` attributes (0.0 to 1.0) rather than 8-digit hex codes.
-- **Typography**: Use standard fonts only (e.g., Arial, Calibri, Segoe UI). Use `<tspan>` for rich text formatting.
-
-#### Structural Rules
-- **InfoBox (`data-element-type="infoBox"`)**: Wrap logical components in `<g id="[unique_id]" data-element-type="infoBox">`.
-- **Connectors (`data-element-type="connector"`)**: Must be kept isolated at the root level (never nested inside other `<g>` groups) as `<line>` or `<polyline>`.
-  - **Required attributes**: `data-start="[source_id]"`, `data-end="[target_id]"`, `data-connector-type="straight|elbow|curve"`.
-  - **Arrowheads**: Supported via `marker-start` and `marker-end` attributes referencing standard marker defs (`none`, `arrow`, `diamond`, `stealth`).
-- **Icons (`data-element-type="icon"`)**: Isolate inside a group and nest a child `<svg>` with explicit `x`, `y`, `width`, `height`, and `viewBox` attributes.
 
 ## License
 
