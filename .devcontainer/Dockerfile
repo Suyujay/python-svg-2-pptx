@@ -13,8 +13,10 @@ RUN apk add --no-cache \
 # Create a non-root user that VS Code can use
 RUN adduser -D vscode
 
-# Install python-pptx, testing tools, and other required python packages
-RUN pip install --no-cache-dir python-pptx pytest pytest-cov
+# Copy requirements file and install dependencies
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt \
+    && rm /tmp/requirements.txt
 
 # Set default user
 USER vscode

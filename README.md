@@ -131,6 +131,36 @@ prs = PPTXBackend([ir_slide]).render()
 prs.save("output.pptx")
 ```
 
+## API Deployment (FastAPI)
+
+This project includes a FastAPI application in the `app/` folder that can be deployed to Vercel.
+
+### Endpoint: `POST /sources/SVG/target/PPTX:convert`
+
+Converts raw SVG metadata to a downloadable `.pptx` file.
+
+**Query Parameters:**
+- `filename`: (Required) The name of the output PPTX file (e.g., `presentation.pptx`).
+
+**Request Body:**
+- The request body must be the raw SVG text strings (Content-Type should be `text/plain` or `image/svg+xml`).
+
+**Example Request:**
+```bash
+curl -X POST "https://your-app.vercel.app/sources/SVG/target/PPTX:convert?filename=my_slide.pptx" \
+     -H "Content-Type: text/plain" \
+     --data-binary "@input.svg"
+```
+
+### Local Development
+
+1. Install requirements: `pip install -r requirements.txt`
+2. Run the server: `uvicorn app.main:app --reload`
+
+### Vercel Deployment
+
+The project is configured for Vercel via `vercel.json`. Simply connect your repository to Vercel and it will automatically detect the Python configuration.
+
 ## Development & Testing
 
 ### Development Environment (VS Code Dev Container)
