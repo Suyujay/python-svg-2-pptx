@@ -9,10 +9,12 @@ from surquest.fastapi.utils.route import Route  # custom routes for documentatio
 
 
 # Add if a folder exists a folder ../src to import paths
-if os.path.exists("./src"):
-    sys.path.append("./src")
+if os.path.exists("./spd"):
+    sys.path.append("./spd")
 
 from surquest.utils.svg2pptx import SVG2Pptx
+from svgparser import SVGParser
+from pptxmaker import PPTXMaker
 
 app = FastAPI(title="SVG to PPTX API")
 
@@ -52,17 +54,17 @@ async def convert_svg_to_pptx(
         with tempfile.NamedTemporaryFile(suffix=".pptx", delete=False) as tmp:
             tmp_path = tmp.name
 
-        # Initialize converter
-        converter = SVG2Pptx()
-        
-        # Convert SVG string to PPTX
-        # Note: SVG2Pptx.convert handles both file paths and SVG strings
-        converter.convert(
-            svg_input=svg_content,
-            output_path=tmp_path
-        )
+# 1. Initialize the SVG Parser
+        parser = SVGParser(title=f"Slide: {filename}", base_unit="pixels")
 
-        # Read the generated file
+        # 2. Convert SVG file to JSON intermediate representation (IR)
+        json_data = parser.parse_file(svg_content)
+
+        # 3. Generate PPTX from the JSON data directly
+        maker = PPTXMaker(json_data)
+        maker.build().save(tmp_path)
+
+        # 4. Read the generated file
         with open(tmp_path, "rb") as f:
             pptx_data = f.read()
 

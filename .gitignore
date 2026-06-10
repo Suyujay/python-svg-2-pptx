@@ -2,6 +2,10 @@
 data/*.json
 data/*.pptx
 data/*.docx
+spd/data
+spd/run.py
+spd/README.md
+spd/svgparser/schema.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
