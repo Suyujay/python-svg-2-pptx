@@ -54,11 +54,11 @@ async def convert_svg_to_pptx(
         with tempfile.NamedTemporaryFile(suffix=".pptx", delete=False) as tmp:
             tmp_path = tmp.name
 
-# 1. Initialize the SVG Parser
+        # 1. Initialize the SVG Parser
         parser = SVGParser(title=f"Slide: {filename}", base_unit="pixels")
 
         # 2. Convert SVG file to JSON intermediate representation (IR)
-        json_data = parser.parse_file(svg_content)
+        json_data = parser.parse_string(svg_content)
 
         # 3. Generate PPTX from the JSON data directly
         maker = PPTXMaker(json_data)
