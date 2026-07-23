@@ -50,7 +50,15 @@ CSS_COLORS = {
     "orange": "#ffa500", "brown": "#a52a2a", "transparent": "none", "none": "none"
 }
 
-def _parse_color(value: Optional[str]) -> Optional[Color]:
+FONT_FAMILY_MAP = {
+    "monospace": "Consolas",
+    "sans-serif": "Arial",
+    "serif": "Times New Roman",
+    "cursive": "Brush Script MT",
+    "fantasy": "Papyrus",
+}
+
+def _parse_color(value: Optional[str], opacity: float = 1.0) -> Optional[Color]:
     if not value:
         return None
     v = value.strip().lower()
@@ -61,12 +69,18 @@ def _parse_color(value: Optional[str]) -> Optional[Color]:
         if v == "none":
             return None
     if v.startswith("#"):
-        return Color.from_hex(v)
+        return Color.from_hex(v, opacity)
     if v.startswith("rgb("):
         m = re.match(r"rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)", v)
         if m:
-            return Color(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            return Color(int(m.group(1)), int(m.group(2)), int(m.group(3)), opacity)
     return None
+
+def _parse_font_family(value: Optional[str]) -> str:
+    if not value:
+        return "Arial"
+    family = value.strip().lower().strip("'\"")
+    return FONT_FAMILY_MAP.get(family, value.strip().strip("'\""))
 
 def _parse_float(value: Optional[str], default: float = 0.0) -> float:
     if value is None:

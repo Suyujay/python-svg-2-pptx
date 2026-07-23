@@ -221,12 +221,14 @@ class PPTXBackend:
         if rect.fill:
             shape.fill.solid()
             shape.fill.fore_color.rgb = rect.fill.to_rgb()
+            self._apply_fill_opacity(shape, rect.fill.opacity)
         else:
             shape.fill.background()
 
         if rect.stroke:
             shape.line.color.rgb = rect.stroke.to_rgb()
             shape.line.width = max(rect.stroke_width_emu, 1)
+            self._apply_line_opacity(shape, rect.stroke.opacity)
         else:
             shape.line.fill.background()
 
@@ -252,12 +254,14 @@ class PPTXBackend:
         if el.fill:
             shape.fill.solid()
             shape.fill.fore_color.rgb = el.fill.to_rgb()
+            self._apply_fill_opacity(shape, el.fill.opacity)
         else:
             shape.fill.background()
 
         if el.stroke:
             shape.line.color.rgb = el.stroke.to_rgb()
             shape.line.width = max(el.stroke_width_emu, 1)
+            self._apply_line_opacity(shape, el.stroke.opacity)
         else:
             shape.line.fill.background()
 
@@ -548,5 +552,42 @@ class PPTXBackend:
                 for child in pr.findall(qn("a:effectLst")):
                     pr.remove(child)
                 lxml_etree.SubElement(pr, qn("a:effectLst"))
+        except Exception:
+            pass
+
+    def _apply_fill_opacity(self, shape, opacity: float) -> None:
+        if opacity >= 1.0:
+            return
+        try:
+            elem = shape._element
+            spPr = elem.find(qn("p:spPr"))
+            if spPr is None:
+                spPr = elem.find(qn("wsp:spPr"))
+            if spPr is None:
+                return
+            solidFill = spPr.find(qn("a:solidFill"))
+            if solidFill is None:
+                return
+            srgbClr = solidFill.find(qn("a:srgbClr"))
+            if srgbClr is not None:
+                alpha_val = int(opacity * 100000)
+                alpha = lxml_etree.SubElement(srgbClr, qn("a:alpha"))
+                alpha.set("val", str(alpha_val))
+        except Exception:
+            pass
+
+    def _apply_line_opacity(self, shape, opacity: float) -> None:
+        if opacity >= 1.0:
+            return
+        try:
+            ln = shape.line._get_or_add_ln()
+            solidFill = ln.find(qn("a:solidFill"))
+            if solidFill is None:
+                return
+            srgbClr = solidFill.find(qn("a:srgbClr"))
+            if srgbClr is not None:
+                alpha_val = int(opacity * 100000)
+                alpha = lxml_etree.SubElement(srgbClr, qn("a:alpha"))
+                alpha.set("val", str(alpha_val))
         except Exception:
             pass
