@@ -1,5 +1,6 @@
 from .base import IRNode
 from .color import Color
+from .gradient import GradientStop, GradientFill
 from .canvas import Geometry, Point, IRSlide
 from .text import FontStyle, TextRun, TextBlock, IRText
 from .connector import ArrowType, ConnectorType, IRConnector
@@ -14,6 +15,8 @@ from .icons import IRIcon
 __all__ = [
     "IRNode",
     "Color",
+    "GradientStop",
+    "GradientFill",
     "Geometry",
     "Point",
     "IRSlide",

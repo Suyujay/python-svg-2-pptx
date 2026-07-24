@@ -1,5 +1,5 @@
 import re
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Union
 from xml.etree import ElementTree as ET
 from pptx.util import Emu
 from pptx.enum.text import PP_ALIGN
@@ -7,7 +7,8 @@ from pptx.enum.text import PP_ALIGN
 from ..models import (
     IRSlide, IRNode, IRRectangle, IRIcon, IRText, IRLine, IRConnector, IRInfoBox, IRGroup,
     IREllipse, IRPolygon,
-    Geometry, Color, FontStyle, TextRun, TextBlock, Point, ArrowType, ConnectorType
+    Geometry, Color, GradientStop, GradientFill, FontStyle, TextRun, TextBlock, Point,
+    ArrowType, ConnectorType
 )
 
 class CoordinateNormalizer:
@@ -90,4 +91,55 @@ def _parse_float(value: Optional[str], default: float = 0.0) -> float:
 
 def _parse_dash(value: Optional[str]) -> bool:
     return value is not None and value.strip() not in ("", "none")
+
+
+def _parse_gradient_stops(grad_el: ET.Element) -> tuple:
+    """Parse <stop> elements inside a gradient, return tuple of GradientStop."""
+    ns = "{http://www.w3.org/2000/svg}"
+    stops = []
+    for stop_el in grad_el.findall(f"{ns}stop") or grad_el.findall("stop"):
+        offset_str = stop_el.get("offset", "0%")
+        if offset_str.endswith("%"):
+            pos = float(offset_str.rstrip("%")) / 100.0
+        else:
+            pos = float(offset_str)
+        stop_color_str = stop_el.get("stop-color", "#000000")
+        stop_opacity = _parse_float(stop_el.get("stop-opacity"), 1.0)
+        color = _parse_color(stop_color_str, stop_opacity)
+        if color:
+            stops.append(GradientStop(color=color, position=pos))
+    return tuple(stops)
+
+
+def _parse_gradient(grad_el: ET.Element) -> Optional[GradientFill]:
+    """Parse a <linearGradient> or <radialGradient> element."""
+    stops = _parse_gradient_stops(grad_el)
+    if not stops:
+        return None
+    gradient_units = grad_el.get("gradientUnits", "objectBoundingBox")
+    x1 = _parse_float(grad_el.get("x1"), 0.0)
+    y1 = _parse_float(grad_el.get("y1"), 0.0)
+    x2 = _parse_float(grad_el.get("x2"), 1.0)
+    y2 = _parse_float(grad_el.get("y2"), 0.0)
+    import math
+    angle = math.degrees(math.atan2(y2 - y1, x2 - x1))
+    return GradientFill(
+        stops=stops,
+        angle=angle,
+        gradient_units=gradient_units,
+    )
+
+
+def _parse_fill(value: Optional[str], opacity: float = 1.0,
+                 gradients: Optional[dict] = None) -> Optional[Union[Color, GradientFill]]:
+    """Parse fill attribute, supporting both solid colors and url(#id) gradient refs."""
+    if not value:
+        return None
+    v = value.strip()
+    if v.startswith("url("):
+        m = re.match(r"url\(#([^)]+)\)", v)
+        if m and gradients:
+            return gradients.get(m.group(1))
+        return None
+    return _parse_color(v, opacity)
 

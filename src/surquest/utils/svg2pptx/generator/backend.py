@@ -13,7 +13,7 @@ from pptx.util import Emu, Pt
 from ..models import (
     IRSlide, IRNode, IRInfoBox, IRText, IRRectangle, IRIcon, IRLine, IRGroup,
     IREllipse, IRPolygon,
-    IRConnector, Point, Color, ArrowType, ConnectorType, TextBlock
+    IRConnector, Point, Color, GradientFill, ArrowType, ConnectorType, TextBlock
 )
 from .image_patch import _pptx_image
 
@@ -219,9 +219,12 @@ class PPTXBackend:
                 shape.adjustments[0] = adj_val
 
         if rect.fill:
-            shape.fill.solid()
-            shape.fill.fore_color.rgb = rect.fill.to_rgb()
-            self._apply_fill_opacity(shape, rect.fill.opacity)
+            if isinstance(rect.fill, GradientFill):
+                self._apply_gradient_fill(shape, rect.fill)
+            else:
+                shape.fill.solid()
+                shape.fill.fore_color.rgb = rect.fill.to_rgb()
+                self._apply_fill_opacity(shape, rect.fill.opacity)
         else:
             shape.fill.background()
 
@@ -252,9 +255,12 @@ class PPTXBackend:
         )
         
         if el.fill:
-            shape.fill.solid()
-            shape.fill.fore_color.rgb = el.fill.to_rgb()
-            self._apply_fill_opacity(shape, el.fill.opacity)
+            if isinstance(el.fill, GradientFill):
+                self._apply_gradient_fill(shape, el.fill)
+            else:
+                shape.fill.solid()
+                shape.fill.fore_color.rgb = el.fill.to_rgb()
+                self._apply_fill_opacity(shape, el.fill.opacity)
         else:
             shape.fill.background()
 
@@ -292,8 +298,11 @@ class PPTXBackend:
         shape = fb.convert_to_shape()
 
         if poly.fill and poly.is_closed:
-            shape.fill.solid()
-            shape.fill.fore_color.rgb = poly.fill.to_rgb()
+            if isinstance(poly.fill, GradientFill):
+                self._apply_gradient_fill(shape, poly.fill)
+            else:
+                shape.fill.solid()
+                shape.fill.fore_color.rgb = poly.fill.to_rgb()
         else:
             shape.fill.background()
 
@@ -591,3 +600,38 @@ class PPTXBackend:
                 alpha.set("val", str(alpha_val))
         except Exception:
             pass
+
+    def _apply_gradient_fill(self, shape, gradient: GradientFill) -> None:
+        """Apply a gradient fill to a shape."""
+        try:
+            shape.fill.gradient()
+            # Set gradient angle (PowerPoint uses 60000ths of a degree)
+            lin_angle = int(gradient.angle * 60000)
+            # Set stops
+            stops = shape.fill.gradient_stops
+            # Remove existing stops (keep at least one)
+            while len(stops) > 1:
+                stops[0]._element.getparent().remove(stops[0]._element)
+            # Add gradient stops
+            gsLst = shape._element.find(qn('p:spPr')).find(qn('a:gradFill')).find(qn('a:gsLst'))
+            if gsLst is None:
+                gradFill = shape._element.find(qn('p:spPr')).find(qn('a:gradFill'))
+                gsLst = lxml_etree.SubElement(gradFill, qn('a:gsLst'))
+            # Clear existing stops
+            for gs in gsLst.findall(qn('a:gs')):
+                gsLst.remove(gs)
+            # Add new stops
+            for stop in gradient.stops:
+                gs = lxml_etree.SubElement(gsLst, qn('a:gs'))
+                gs.set('pos', str(int(stop.position * 100000)))
+                srgbClr = lxml_etree.SubElement(gs, qn('a:srgbClr'))
+                srgbClr.set('val', f'{stop.color.r:02X}{stop.color.g:02X}{stop.color.b:02X}')
+            # Set linear angle
+            lin = shape._element.find(qn('p:spPr')).find(qn('a:gradFill')).find(qn('a:lin'))
+            if lin is None:
+                lin = lxml_etree.SubElement(shape._element.find(qn('p:spPr')).find(qn('a:gradFill')), qn('a:lin'))
+            lin.set('ang', str(lin_angle))
+            lin.set('scaled', '1')
+        except Exception as e:
+            logger.warning("Could not apply gradient fill: %s", e)
+            shape.fill.background()

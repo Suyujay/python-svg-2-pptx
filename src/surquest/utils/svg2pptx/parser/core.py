@@ -7,9 +7,9 @@ from pptx.enum.text import PP_ALIGN
 from ..models import (
     IRSlide, IRNode, IRRectangle, IRIcon, IRText, IRLine, IRConnector, IRInfoBox, IRGroup,
     IREllipse, IRPolygon,
-    Geometry, Color, FontStyle, TextRun, TextBlock, Point, ArrowType, ConnectorType
+    Geometry, Color, GradientFill, FontStyle, TextRun, TextBlock, Point, ArrowType, ConnectorType
 )
-from .utils import CoordinateNormalizer, _strip_ns, _parse_color, _parse_float, _parse_dash, _parse_font_family
+from .utils import CoordinateNormalizer, _strip_ns, _parse_color, _parse_float, _parse_dash, _parse_font_family, _parse_gradient, _parse_fill
 
 class SVGParser:
     """Frontend: SVG -> IR."""
@@ -22,6 +22,7 @@ class SVGParser:
         vb = self.root.get("viewBox", "0 0 960 540").split()
         viewbox = tuple(float(v) for v in vb)  # type: ignore
         self.norm = CoordinateNormalizer(viewbox, self.slide_width, self.slide_height)
+        self.gradients = self._parse_defs()
 
     # ---------- Public API ----------
 
@@ -29,6 +30,21 @@ class SVGParser:
         slide = IRSlide(width_emu=self.slide_width, height_emu=self.slide_height)
         self._traverse(self.root, slide.nodes)
         return slide
+
+    def _parse_defs(self) -> dict:
+        """Extract gradient definitions from <defs> elements."""
+        gradients = {}
+        for defs_el in self.root.iter():
+            if _strip_ns(defs_el.tag) == "defs":
+                for child in defs_el:
+                    tag = _strip_ns(child.tag)
+                    if tag in ("linearGradient", "radialGradient"):
+                        grad_id = child.get("id")
+                        if grad_id:
+                            grad = _parse_gradient(child)
+                            if grad:
+                                gradients[grad_id] = grad
+        return gradients
 
     def _parse_transform(self, transform_str: str) -> Tuple[float, float]:
         dx, dy = 0.0, 0.0
@@ -145,7 +161,7 @@ class SVGParser:
                 self.norm.x(x), self.norm.y(y),
                 self.norm.w(w), self.norm.h(h)
             ),
-            fill=_parse_color(el.get("fill"), fill_opacity),
+            fill=_parse_fill(el.get("fill"), fill_opacity, self.gradients),
             stroke=_parse_color(el.get("stroke"), stroke_opacity),
             stroke_width_emu=int(self.norm.w(_parse_float(el.get("stroke-width"), 1))),
             corner_radius_emu=int(self.norm.w(rx)),
@@ -173,7 +189,7 @@ class SVGParser:
                 self.norm.x(cx - rx), self.norm.y(cy - ry),
                 self.norm.w(rx * 2), self.norm.h(ry * 2)
             ),
-            fill=_parse_color(el.get("fill"), fill_opacity),
+            fill=_parse_fill(el.get("fill"), fill_opacity, self.gradients),
             stroke=_parse_color(el.get("stroke"), stroke_opacity),
             stroke_width_emu=int(self.norm.w(_parse_float(el.get("stroke-width"), 1))),
             dashed=_parse_dash(el.get("stroke-dasharray")),
@@ -194,7 +210,7 @@ class SVGParser:
         return IRPolygon(
              waypoints=waypoints,
              is_closed=is_closed,
-             fill=_parse_color(el.get("fill")) if is_closed else None,
+             fill=_parse_fill(el.get("fill"), gradients=self.gradients) if is_closed else None,
              stroke=_parse_color(el.get("stroke")),
              stroke_width_emu=int(self.norm.w(_parse_float(el.get("stroke-width"), 1))),
              dashed=_parse_dash(el.get("stroke-dasharray")),
