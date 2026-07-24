@@ -11,6 +11,7 @@ from .polygon import IRPolygon
 from .infobox import IRInfoBox
 from .group import IRGroup
 from .icons import IRIcon
+from .image import IRImage
 
 __all__ = [
     "IRNode",
@@ -34,4 +35,5 @@ __all__ = [
     "IRInfoBox",
     "IRGroup",
     "IRIcon",
+    "IRImage",
 ]

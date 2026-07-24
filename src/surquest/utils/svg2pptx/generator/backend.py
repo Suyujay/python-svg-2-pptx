@@ -12,7 +12,7 @@ from pptx.util import Emu, Pt
 
 from ..models import (
     IRSlide, IRNode, IRInfoBox, IRText, IRRectangle, IRIcon, IRLine, IRGroup,
-    IREllipse, IRPolygon,
+    IREllipse, IRPolygon, IRImage,
     IRConnector, Point, Color, GradientFill, ArrowType, ConnectorType, TextBlock
 )
 from .image_patch import _pptx_image
@@ -75,6 +75,8 @@ class PPTXBackend:
             return self._render_decorative_line(node)
         elif isinstance(node, IRGroup):
             return self._render_group(node)
+        elif isinstance(node, IRImage):
+            return self._render_image(node)
         return None
 
     # ---------- Renderers ----------
@@ -337,6 +339,25 @@ class PPTXBackend:
             )
             placeholder.fill.background()
             placeholder.line.color.rgb = RGBColor(0x00, 0x7B, 0xFF)
+            self._disable_shadow(placeholder)
+            return placeholder
+
+    def _render_image(self, img: IRImage):
+        g = img.geometry
+        try:
+            stream = io.BytesIO(img.image_bytes)
+            pic = self.slide.shapes.add_picture(
+                stream, g.x, g.y, width=g.width, height=g.height
+            )
+            self._disable_shadow(pic)
+            return pic
+        except Exception as e:
+            logger.warning("Could not render image %s: %s", img.href, e)
+            placeholder = self.slide.shapes.add_shape(
+                MSO_SHAPE.RECTANGLE, g.x, g.y, g.width, g.height
+            )
+            placeholder.fill.background()
+            placeholder.line.color.rgb = RGBColor(0xCC, 0x00, 0x00)
             self._disable_shadow(placeholder)
             return placeholder
 

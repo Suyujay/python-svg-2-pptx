@@ -6,18 +6,20 @@ from pptx.enum.text import PP_ALIGN
 
 from ..models import (
     IRSlide, IRNode, IRRectangle, IRIcon, IRText, IRLine, IRConnector, IRInfoBox, IRGroup,
-    IREllipse, IRPolygon,
+    IREllipse, IRPolygon, IRImage,
     Geometry, Color, GradientFill, FontStyle, TextRun, TextBlock, Point, ArrowType, ConnectorType
 )
-from .utils import CoordinateNormalizer, _strip_ns, _parse_color, _parse_float, _parse_dash, _parse_font_family, _parse_gradient, _parse_fill
+from .utils import CoordinateNormalizer, _strip_ns, _parse_color, _parse_float, _parse_dash, _parse_font_family, _parse_gradient, _parse_fill, _load_image_bytes
 
 class SVGParser:
     """Frontend: SVG -> IR."""
 
-    def __init__(self, svg_source: str, slide_width: int, slide_height: int, svg_ns: str):
+    def __init__(self, svg_source: str, slide_width: int, slide_height: int, svg_ns: str,
+                 svg_path: str = None):
         self.slide_width = slide_width
         self.slide_height = slide_height
         self.svg_ns = svg_ns
+        self.svg_path = svg_path
         self.root = ET.fromstring(svg_source)
         vb = self.root.get("viewBox", "0 0 960 540").split()
         viewbox = tuple(float(v) for v in vb)  # type: ignore
@@ -82,6 +84,10 @@ class SVGParser:
                 nodes.append(self._parse_poly(child, ndx, ndy))
             elif tag == "path":
                 nodes.append(self._parse_path_as_svg(child, ndx, ndy))
+            elif tag == "image":
+                img = self._parse_image(child, ndx, ndy)
+                if img is not None:
+                    nodes.append(img)
             elif tag == "g":
                 group_nodes = []
                 self._traverse(child, group_nodes, ndx, ndy)
@@ -266,6 +272,31 @@ class SVGParser:
                 self.norm.w(w), self.norm.h(h)
             ),
             svg_bytes=svg_str,
+        )
+
+    def _parse_image(self, el: ET.Element, dx: float = 0.0, dy: float = 0.0) -> Optional[IRImage]:
+        x = _parse_float(el.get("x")) + dx
+        y = _parse_float(el.get("y")) + dy
+        w = _parse_float(el.get("width"))
+        h = _parse_float(el.get("height"))
+        href = el.get("href") or el.get("{http://www.w3.org/1999/xlink}href") or ""
+        preserve_aspect = el.get("preserveAspectRatio", "xMidYMid meet")
+
+        result = _load_image_bytes(href, self.svg_path)
+        if result is None:
+            return None
+
+        image_bytes, content_type = result
+        return IRImage(
+            geometry=Geometry(
+                self.norm.x(x), self.norm.y(y),
+                self.norm.w(w), self.norm.h(h)
+            ),
+            href=href,
+            image_bytes=image_bytes,
+            content_type=content_type,
+            preserve_aspect_ratio=preserve_aspect,
+            shape_id=el.get("id"),
         )
 
     def _parse_text(self, el: ET.Element,

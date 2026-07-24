@@ -143,3 +143,67 @@ def _parse_fill(value: Optional[str], opacity: float = 1.0,
         return None
     return _parse_color(v, opacity)
 
+
+def _resolve_image_path(href: str, svg_path: Optional[str] = None) -> Optional[str]:
+    """Resolve image href to absolute file path.
+
+    Handles:
+    - data: URIs (returned as-is, caller handles decoding)
+    - Absolute file paths (returned as-is)
+    - Relative paths (resolved against svg_path's directory)
+    """
+    from pathlib import Path
+
+    if not href:
+        return None
+
+    href = href.strip()
+
+    # data: URI - return as-is
+    if href.startswith("data:"):
+        return href
+
+    # Absolute path
+    if Path(href).is_absolute():
+        return href if Path(href).exists() else None
+
+    # Relative path - resolve against SVG file location
+    if svg_path:
+        svg_dir = Path(svg_path).parent
+        resolved = (svg_dir / href).resolve()
+        if resolved.exists():
+            return str(resolved)
+
+    return None
+
+
+def _load_image_bytes(href: str, svg_path: Optional[str] = None) -> Optional[Tuple[bytes, str]]:
+    """Load image bytes and detect content type.
+
+    Returns (image_bytes, content_type) or None if not found.
+    """
+    import mimetypes
+    from pathlib import Path
+
+    # data: URI
+    if href.startswith("data:"):
+        import base64
+        # format: data:image/png;base64,XXXX
+        m = re.match(r"data:([^;]+);base64,(.+)", href, re.DOTALL)
+        if m:
+            content_type = m.group(1)
+            image_bytes = base64.b64decode(m.group(2))
+            return image_bytes, content_type
+        return None
+
+    # File path
+    resolved = _resolve_image_path(href, svg_path)
+    if resolved:
+        content_type, _ = mimetypes.guess_type(resolved)
+        if content_type is None:
+            content_type = "image/png"
+        with open(resolved, "rb") as f:
+            return f.read(), content_type
+
+    return None
+
