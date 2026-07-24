@@ -345,9 +345,32 @@ class PPTXBackend:
     def _render_image(self, img: IRImage):
         g = img.geometry
         try:
+            from PIL import Image
+            pil_img = Image.open(io.BytesIO(img.image_bytes))
+            orig_w, orig_h = pil_img.size
+
+            # Calculate aspect-ratio-preserving dimensions
+            aspect = orig_w / orig_h
+            target_w = g.width
+            target_h = g.height
+            target_aspect = target_w / target_h
+
+            if aspect > target_aspect:
+                # Image is wider than target - fit to width
+                new_w = target_w
+                new_h = int(target_w / aspect)
+            else:
+                # Image is taller than target - fit to height
+                new_h = target_h
+                new_w = int(target_h * aspect)
+
+            # Center within the target area
+            offset_x = (target_w - new_w) // 2
+            offset_y = (target_h - new_h) // 2
+
             stream = io.BytesIO(img.image_bytes)
             pic = self.slide.shapes.add_picture(
-                stream, g.x, g.y, width=g.width, height=g.height
+                stream, g.x + offset_x, g.y + offset_y, width=new_w, height=new_h
             )
             self._disable_shadow(pic)
             return pic
