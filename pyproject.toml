@@ -31,7 +31,7 @@ test = [
 "Original" = "https://github.com/surquest/python-svg-2-pptx"
 
 [tool.hatch.build.targets.wheel]
-packages = ["surquest"]
+packages = ["src/surquest"]
 
 [tool.hatch.build.targets.sdist.sources]
 "src" = ""
